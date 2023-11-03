@@ -59,8 +59,8 @@ export const allPosts = async (req, res) => {
     const data = await postModel
       .find()
       .populate("userId", "username userImage")
-      .skip(skip)
-      .limit(2)
+      // .skip(skip)
+      // .limit(2)
     return res.status(201).json(data);
   } catch (e) {
     return res.status(401).json(e);
