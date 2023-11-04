@@ -1,23 +1,23 @@
-import env from 'dotenv'
-env.config('.env');
+import env from "dotenv";
+env.config(".env");
 
-import express from 'express';
+import express from "express";
 const app = express();
 
-import dbConnection from './db.js';
-import post from './routes/postRoute.js';
-import user from './routes/userRoute.js';
-import conversation from './routes/conversationRoute.js';
-import message from './routes/msgRoute.js';
-import cors from 'cors';
-import { auth } from './middleware/auth.js';
-import http from 'http';
-import { Server } from 'socket.io';
+import dbConnection from "./db.js";
+import post from "./routes/postRoute.js";
+import user from "./routes/userRoute.js";
+import conversation from "./routes/conversationRoute.js";
+import message from "./routes/msgRoute.js";
+import cors from "cors";
+import { auth } from "./middleware/auth.js";
+import http from "http";
+import { Server } from "socket.io";
 const port = process.env.PORT || 8000;
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,19 +26,27 @@ dbConnection();
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: 'https://social-media-frontend-alpha-nine.vercel.app',
-        credentials: true,
-    },
+  cors: {
+    origin: "https://social-media-frontend-alpha-nine.vercel.app",
+    credentials: true,
+  },
 });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/postImages', express.static(path.join(__dirname, 'public/postImages')));
-app.use('/userImages', express.static(path.join(__dirname, 'public/userImages')));
+app.use(
+  "/postImages",
+  express.static(path.join(__dirname, "public/postImages"))
+);
+app.use(
+  "/userImages",
+  express.static(path.join(__dirname, "public/userImages"))
+);
 
-app.use(cors({ origin: "https://social-media-frontend-alpha-nine.vercel.app" }));
+app.use(
+  cors({ origin: "https://social-media-frontend-alpha-nine.vercel.app" })
+);
 
 app.use("/post", post);
 app.use("/user", user);
@@ -48,32 +56,31 @@ app.use("/message", auth, message);
 // socket.io implementation
 const onlineUsers = new Map();
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
+  socket.on("userConnected", (userId) => {
+    onlineUsers.set(userId, socket.id);
+    io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
+  });
 
-    socket.on('userConnected', (userId) => {
-        onlineUsers.set(userId, socket.id);
-        io.emit('updateOnlineUsers', Array.from(onlineUsers.keys()));
-    });
-
-    socket.on('disconnect', () => {
-        const userId = Array.from(onlineUsers.keys()).find((key) => {
-            return onlineUsers.get(key) === socket.id
-        });
-        
-        if (userId) {
-            onlineUsers.delete(userId);
-            io.emit('updateOnlineUsers', Array.from(onlineUsers.keys()));
-        }
+  socket.on("disconnect", () => {
+    const userId = Array.from(onlineUsers.keys()).find((key) => {
+      return onlineUsers.get(key) === socket.id;
     });
 
-    socket.on("sendmsg", (data) => {
-        io.emit("msg", data);
-    });
-    socket.on('close', () => {
-        console.log('Client disconnected.');
-    });
+    if (userId) {
+      onlineUsers.delete(userId);
+      io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
+    }
+  });
+
+  socket.on("sendmsg", (data) => {
+    io.emit("msg", data);
+  });
+  socket.on("close", () => {
+    console.log("Client disconnected.");
+  });
 });
 
 server.listen(port, () => {
-    console.log(`Application Listening on port ${port}`);
+  console.log(`Application Listening on port ${port}`);
 });
