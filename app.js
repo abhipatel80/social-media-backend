@@ -16,13 +16,6 @@ import { Server } from "socket.io";
 import { cloudinaryConfig } from "./utils/cloudinaryConfig.js";
 const port = process.env.PORT || 8000;
 
-// import path from "path";
-// import { fileURLToPath } from "url";
-// import { dirname } from "path";
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
 dbConnection();
 app.use("*", cloudinaryConfig);
 
@@ -36,15 +29,6 @@ const io = new Server(server, {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// app.use(
-//   "/postImages",
-//   express.static(path.join(__dirname, "public/postImages"))
-// );
-// app.use(
-//   "/userImages",
-//   express.static(path.join(__dirname, "public/userImages"))
-// );
 
 app.use(
   cors({ origin: "https://social-media-frontend-alpha-nine.vercel.app" })
