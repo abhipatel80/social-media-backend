@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
       return onlineUsers.get(key) === socket.id;
     });
 
-    if (userId) {
+    if (userId) { 
       onlineUsers.delete(userId);
       io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
     }
