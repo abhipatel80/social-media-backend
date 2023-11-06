@@ -1,11 +1,15 @@
 import postModel from "../models/postModel.js";
+import getDatauri from "../utils/dataUri.js";
+import { uploader } from "../utils/cloudinaryConfig.js";
 
 // create new post
 export const createPost = async (req, res) => {
   try {
     let postImage;
     if (req?.file) {
-      postImage = req?.file?.filename;
+      const file = getDatauri(req.file);
+      const uploadFile = await uploader.upload(file.content);
+      postImage = uploadFile.secure_url;
     }
 
     const { caption } = req.body;
@@ -17,7 +21,7 @@ export const createPost = async (req, res) => {
     }
     const data = await postModel.create({
       caption,
-      postImage: "/postImages/" + postImage,
+      postImage,
       userId: req.user.id,
       userName: req.user.username,
     });
@@ -58,9 +62,9 @@ export const allPosts = async (req, res) => {
     const skip = (page - 1) * 2;
     const data = await postModel
       .find()
-      .populate("userId", "username userImage")
-      // .skip(skip)
-      // .limit(2)
+      .populate("userId", "username userImage");
+    // .skip(skip)
+    // .limit(2)
     return res.status(201).json(data);
   } catch (e) {
     return res.status(401).json(e);

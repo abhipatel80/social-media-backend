@@ -9,15 +9,17 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-// post image upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/postImages/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname)
-    }
-});
+// // post image upload
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'public/postImages/')
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + "-" + file.originalname)
+//     }
+// });
+
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage, limits: {
@@ -26,22 +28,22 @@ const upload = multer({
     fileFilter,
 });
 
-// user image upload
-const mystorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/userImages/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname)
-    }
-});
+// // user image upload
+// const mystorage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'public/userImages/')
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + "-" + file.originalname)
+//     }
+// });
 
-export const userImgupload = multer({
-    storage: mystorage,
-    limits: {
-        fileSize: 1024 * 1024 * 2
-    },
-    fileFilter,
-});
+// export const userImgupload = multer({
+//     storage: mystorage,
+//     limits: {
+//         fileSize: 1024 * 1024 * 2
+//     },
+//     fileFilter,
+// });
 
 export default upload
