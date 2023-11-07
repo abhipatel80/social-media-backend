@@ -48,7 +48,12 @@ export const singlePost = async (req, res) => {
   try {
     const post = await postModel
       .findById(req.params.id)
-      .populate("userId", "username userImage");
+      .populate("userId", "username userImage")
+      .populate({
+        path: "comments.userId",
+        select: "userImage",
+        model: "User",
+      });
     return res.status(201).json(post);
   } catch (e) {
     return res.status(401).json(e);
