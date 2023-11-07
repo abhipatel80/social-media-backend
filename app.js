@@ -31,7 +31,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(
-  cors({ origin: "https://social-media-frontend-alpha-nine.vercel.app" })
+  cors({
+    origin: "https://social-media-frontend-alpha-nine.vercel.app",
+    credentials: true,
+  })
 );
 
 app.use("/post", post);
@@ -53,7 +56,7 @@ io.on("connection", (socket) => {
       return onlineUsers.get(key) === socket.id;
     });
 
-    if (userId) { 
+    if (userId) {
       onlineUsers.delete(userId);
       io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
     }
